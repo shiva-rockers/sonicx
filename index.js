@@ -246,7 +246,7 @@ Sonicx.prototype.listen = function(PORT, callback){
     new Server(this, PORT, callback);
 }
 
-Sonicx.prototype.SecureListen = function(PORT, config, callback){
+Sonicx.prototype.secureListen = function(PORT, config, callback){
     new Server(this, PORT, callback);
 }
 
