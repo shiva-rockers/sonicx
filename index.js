@@ -79,7 +79,8 @@ Router.prototype.execute = function (req, res, _route) {
 
 Router.prototype.getDynamicRoute = function (_route) {
     let dynamicRoute = "";
-    let params = {}
+    let params = {};
+    let modifiedRoute = "";
     const splitedUrl = _route.split("/");
     const dynamicRoutesLength = this.dynamicRoutes[splitedUrl.length] ? this.dynamicRoutes[splitedUrl.length].length : 0;
     for (let i = 0; i < dynamicRoutesLength; i++) {
@@ -87,9 +88,10 @@ Router.prototype.getDynamicRoute = function (_route) {
         for (let j = 0; j < this.dynamicRoutes[splitedUrl.length][i].s.length; j++) {
             if (!this.dynamicRoutes[splitedUrl.length][i].s[j].includes(":")) continue;
             params[this.dynamicRoutes[splitedUrl.length][i].s[j].substring(1)] = splitedUrl[j];
-            this.dynamicRoutes[splitedUrl.length][i].s[j] = splitedUrl[j];
+            modifiedRoute = { s: [...this.dynamicRoutes[splitedUrl.length][i].s], p: [...this.dynamicRoutes[splitedUrl.length][i].p] };
+            modifiedRoute.s[j] = splitedUrl[j];
         }
-        if (_route !== this.dynamicRoutes[splitedUrl.length][i].s.join("/")) continue;
+        if (_route !== modifiedRoute.s.join("/")) continue;
         dynamicRoute = this.dynamicRoutes[splitedUrl.length][i].p;
         break;
     }
@@ -101,7 +103,6 @@ const router = new Router();
 function Server(sonicx, PORT, callback) {
     this.contentTypes = ['application/x-www-form-urlencoded', 'application/json', 'multipart/form-data'];
     sonicx.server = http.createServer((req, res) => {
-
         const { pathname, query } = url.parse(req.url);
         if (query) req.query = { ...queryString.parse(query) };
 
@@ -238,15 +239,15 @@ function Sonicx() {
     this.configuration = {};
 }
 
-Sonicx.prototype.route = function(_path, _routes){
+Sonicx.prototype.route = function (_path, _routes) {
     router.add(_path, _routes, this.configuration);
 }
 
-Sonicx.prototype.listen = function(PORT, callback){
+Sonicx.prototype.listen = function (PORT, callback) {
     new Server(this, PORT, callback);
 }
 
-Sonicx.prototype.secureListen = function(PORT, config, callback){
+Sonicx.prototype.secureListen = function (PORT, config, callback) {
     new Server(this, PORT, callback);
 }
 
