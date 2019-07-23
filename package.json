@@ -1,0 +1,26 @@
+{
+  "name": "sonicx",
+  "version": "1.0-a1",
+  "description": "Nodejs http router wrapper.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "sonicx",
+    "framework",
+    "rest",
+    "api",
+    "router",
+    "restfull",
+    "app"
+  ],
+  "engines": {
+    "node": ">= 8.0"
+  },
+  "author": "Shivam R Mishra",
+  "license": "ISC",
+  "dependencies": {
+    "dicer": "^0.3.0"
+  }
+}
