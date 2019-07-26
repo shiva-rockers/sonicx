@@ -9,11 +9,29 @@
   "keywords": [
     "sonicx",
     "framework",
+    "node-module",
+    "routing",
+    "middleware",
+    "http-server",
+    "multi-part",
+    "form-data",
+    "router",
+    "route",
+    "multipart-formdata",
     "rest",
     "api",
     "router",
     "restfull",
-    "app"
+    "app",
+    "node-module",
+    "routing",
+    "middleware",
+    "http-server",
+    "multi-part",
+    "form-data",
+    "router",
+    "route",
+    "multipart-formdata"
   ],
   "engines": {
     "node": ">= 8.0"
