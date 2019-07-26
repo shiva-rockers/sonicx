@@ -1,7 +1,9 @@
 const os = require('os');
 const fs = require('fs');
 const url = require('url');
+const path = require('path');
 const http = require('http');
+const https = require('https');
 const Dicer = require('dicer');
 const queryString = require('querystring');
 
@@ -44,8 +46,9 @@ Router.prototype.add = function (_path, _routes = [], _globalConfiguration) {
     _routes.forEach((_route) => {
         if (!_route.method) _route.method = 'GET';
         const method = _route.method.toUpperCase();
-        const { error, errorMessage, path } = this.validateRoute(method, _path.concat(_route.path));
+        const { error, errorMessage, path } = this.validateRoute(method, _path.concat(_route.path || ''));
         if (error) return console.error(errorMessage);
+        if (!('controller' in _route)) throw Error("Missing controller is route.");
         this.routesProto.push(path);
         this.routes[path] = new Route(_route.middleware, _route.controller, _route.schema, { ..._globalConfiguration, ..._route.configuration });
         if (path.includes(':')) {
@@ -100,22 +103,19 @@ Router.prototype.getDynamicRoute = function (_route) {
 
 const router = new Router();
 
-function Server(sonicx, PORT, callback) {
+function Server(sonicx, PORT, config, callback) {
     this.contentTypes = ['application/x-www-form-urlencoded', 'application/json', 'multipart/form-data'];
-    sonicx.server = http.createServer((req, res) => {
+    const handler = (req, res) => {
         const { pathname, query } = url.parse(req.url);
         if (query) req.query = { ...queryString.parse(query) };
 
         const { route, routeParam } = router.getRoute(req.method.concat(pathname));
         if (routeParam) req.params = routeParam;
 
-        if (!route) {
-            res.writeHead(404);
-            res.end(JSON.stringify({ error: "Route not found." }));
-            return;
-        }
+        const configuration = route ? route.configuration : sonicx.configuration;
 
-        this.configureRoot(req, res, route.configuration);
+        if (!route) return this.staticServing(res, req.url, configuration.staticPath);
+        this.configureRoot(req, res, configuration);
 
         const [contentType] = req.headers['content-type'] ? req.headers['content-type'].split(";") : '';
         if (req.method === 'GET' || !this.contentTypes.includes(contentType)) return route.run(req, res);
@@ -136,9 +136,9 @@ function Server(sonicx, PORT, callback) {
             }
             case 'multipart/form-data': {
                 const options = {
-                    uploadPath: route.configuration.uploadPath,
-                    memoryUpload: route.configuration.memoryUpload,
-                    disableFormdata: route.configuration.disableFormdata,
+                    uploadPath: configuration.uploadPath,
+                    memoryUpload: configuration.memoryUpload,
+                    disableFormdata: configuration.disableFormdata,
                 };
                 this.parseData(req, options, ({ body = {}, files = {} }) => {
                     req.body = body;
@@ -149,7 +149,13 @@ function Server(sonicx, PORT, callback) {
             }
             default: req.body = {}; break;
         }
-    }).listen(PORT, callback);
+    }
+
+    sonicx.server = config
+        ? https.createServer(config, handler).listen(PORT, callback)
+        : http.createServer(handler).listen(PORT, callback);
+
+    sonicx.server.on('clientError', error => { if (error) console.warn(error); });
 }
 
 Server.prototype.configureRoot = function (req, res, configuration) {
@@ -170,6 +176,29 @@ Server.prototype.configureRoot = function (req, res, configuration) {
     res.setTimeout(configuration.requestTimeout, () => {
         res.writeHead(408);
         res.end(JSON.stringify({ error: "Request Timeout" }));
+    });
+}
+
+Server.prototype.staticServing = function (res, baseUrl, staticPath) {
+    if (!staticPath) {
+        res.writeHead(404);
+        return res.end(JSON.stringify({ error: "Route not found." }));
+    }
+    let requestedPath = path.join(staticPath, baseUrl);
+    if (baseUrl === '/') requestedPath += 'index.html';
+    fs.access(requestedPath, fs.F_OK, (error) => {
+        if (error) {
+            res.writeHead(404);
+            return res.end(JSON.stringify({ error: "File not found." }));
+        }
+        fs.createReadStream(requestedPath).pipe(res);
+        // fs.readFile(requestedPath, (error, chunk) => {
+        //     if (error) {
+        //         res.writeHead(404);
+        //         return res.end(JSON.stringify({ error: "File not found." }));
+        //     }
+        //     res.end(chunk);
+        // });
     });
 }
 
@@ -244,11 +273,11 @@ Sonicx.prototype.route = function (_path, _routes) {
 }
 
 Sonicx.prototype.listen = function (PORT, callback) {
-    new Server(this, PORT, callback);
+    new Server(this, PORT, undefined, callback);
 }
 
-Sonicx.prototype.secureListen = function (PORT, config, callback) {
-    new Server(this, PORT, callback);
+Sonicx.prototype.secureListen = function (PORT, config = {}, callback) {
+    new Server(this, PORT, config, callback);
 }
 
 module.exports = new Sonicx();
