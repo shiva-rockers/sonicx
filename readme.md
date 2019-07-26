@@ -149,7 +149,7 @@ res.send({ key: "It is SonicX" }, 200, { "Authorization" : "Bearer Token"});
 ```
 
 ## Example
-You can find example implementation of sonicx at (github)[]
+You can find examples implemented using sonicx at [github](https://github.com/shiva-rockers/sonicx/tree/master/examples).
 
 
 License
