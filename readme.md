@@ -1,18 +1,18 @@
 # SonicX
 
-SonicX is open source high performence light weight router build upon core nodejs http server.
-  - simple json based routing.
+SonicX is open-source high performance lightweight router build upon core nodejs HTTP server.
+  - simple JSON based routing.
   - less dependent on third party packages.
-  - developer friendly.
+  - developer-friendly.
   - focus on high performance.
 
-And of course SonicX itself is open source with a [public repository](https://github.com/shiva-rockers/sonicx) on GitHub.
+And of course, SonicX itself is open source with a [public repository](https://github.com/shiva-rockers/sonicx) on GitHub.
 
 # Features!
   - robust routing.
   - middleware support.
-  - mulipart form data support ( file uploads without third party library ).
-  - support dynamic routes creation ( /url/:iUserId => access route params from req.params.iUserId ).
+  - multipart form data support ( file uploads without third party library ).
+  - support dynamic routes creation ( /URL/:iUserId => access route params from req.params.iUserId ).
   - static file serving.
   - secure transport layer via https.
   
@@ -52,8 +52,8 @@ Methods  | Description
 ------------- | -------------
 sonicx.listen(PORT, [, callback ]) | Starts the HTTPS server listening for encrypted connections. This method call `http.createServer(config, handler).listen()` method internally.
 sonicx.secureListen(PORT, config,  [, callback ])  | Does same as sonicx.listen but it includes config params for ssl support. This method call `https.createServer(config, handler).listen()` method internally.
-sonicx.server | It is a reference of `http.createServer(...) OR https.createServer(...)` depends upon what are listining.
-sonicx.configuration | Holds properties to configure the globalserver behaviours. 
+sonicx.server | It is a reference of `http.createServer(...) OR https.createServer(...)` depends upon what are listening.
+sonicx.configuration | Holds properties to configure the global server behavior. 
 sonicx.route(rootPath, [ Routes, ... ]) | Holds routes to be called defined path.
 
 ## .server
@@ -73,7 +73,7 @@ sonicx.configuration = {
     disableFormdata: false, // if want to use third party form data parser default is true.
     uploadPath: '_uploads', // default upload path default is os.tempDir().
     memoryUpload: true, // if do not want to store in any directory and want to use as buffers.
-    requestTimeout: 150000, // miliseconds.
+    requestTimeout: 150000, // milliseconds.
     staticPath: 'public', // Serve static files.
     responseHeaders: {
         "Access-Control-Expose-Headers": "*",
@@ -83,9 +83,9 @@ sonicx.configuration = {
 ```
 
 ## .route(rootPath, [ Routes, ... ])
- - rootPath : First parameter of route method, which get concate with each path property of routes defined in array.
- - Routes : This is an JSON Object Holds route properties.
-   - **path [ *Optional* ]** : get concate with rootPath as postfix and generate full path.
+ - rootPath: First parameter of route method, which get concat with each path property of routes defined in array.
+ - Routes: This is a JSON Object Holds route properties.
+   - **path [ *Optional* ]**: get concat with rootPath as postfix and generate a full path.
       - Eg.
         ```sh
         sonicx.route('/user' ,[ { path: '/something' , ... } ];
@@ -94,10 +94,10 @@ sonicx.configuration = {
         sonicx.route('/user/' ,[ { path: 'something' , ... } ];
         // -- Result: '/user/' + 'something' = '/user/something';
         ```
-   - **method [ *Optional* ]** : GET, POST, PUT, DELETE is supported. ( case insenstive ).
-   - **configuration [ *Optional* ]** : Route level configuration will override the global configuration and has same properties as global configuration does excluding `staticPath` because it must be a global configuration.
-   - **middleware(req, res, next) [ *Optional* ]** : Has access of req, res and next. controller will be execute only after calling `next` method if middleware is defined. 
-   - **controller(req, res) [ *Required* ]** : Has access of req, res and responsible for writing API logic. 
+   - **method [ *Optional* ]**: GET, POST, PUT, DELETE is supported. ( case insensitive ).
+   - **configuration [ *Optional* ]**: Route level configuration will override the global configuration and has the same properties as the global configuration does excluding `staticPath` because it must be a global configuration.
+   - **middleware(req, res, next) [ *Optional* ]**: has access to req, res and next. the controller will be executed only after calling the `next` method if the middleware is defined. 
+   - **controller(req, res) [ *Required* ]**: has access to req, res and responsible for writing API logic. 
 
    Eg.
    ```sh
@@ -113,9 +113,9 @@ sonicx.configuration = {
    ```
 
 ## Request and Response parameter
- Request and Response parameter has all property of nodejs http server handler does. [http server](https://nodejs.org/api/http.html#http_class_http_server).
+ Request and Response parameter has all property of nodejs HTTP server handler does. [http server](https://nodejs.org/api/http.html#http_class_http_server).
  
- Request parameter has some other propertie added such as.
+ Request parameter has some other properties added such as.
  
  - **req.body** : Contains JSON object sent in body of request from front-end.
  - **req.params** : Contains JSON object fetched from dynamic url path.
@@ -141,7 +141,7 @@ sonicx.configuration = {
     - length : length of buffer in bytes [ Only when `memoryUpload` is true ]
     - path : path where files is stored [ Only when `memoryUpload` is false ]
 
- Response parameter has some other propertie added such as
+ Response parameter has some other properties added such as
  ```
 // res.send(response:JSON, code:httpStatusCode [Optional], headers:Objects[Optional]);
 
