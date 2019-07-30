@@ -7,6 +7,17 @@ const https = require('https');
 const Dicer = require('dicer');
 const queryString = require('querystring');
 
+const contentTypes = {
+    ".html": "text/html",
+    ".js": "application/javascript",
+    ".css": "text/css",
+    ".json": "application/json",
+    ".png": "image/png",
+    ".jpg": "image/jpg",
+    ".jpeg": "image/jpeg",
+    ".mp4": "video/mp4",
+}
+
 function Route(middleware, controller, schema = {}, configuration = {}) {
     this.middleware = middleware;
     this.controller = controller;
@@ -154,7 +165,6 @@ function Server(sonicx, PORT, config, callback) {
     sonicx.server = config
         ? https.createServer(config, handler).listen(PORT, callback)
         : http.createServer(handler).listen(PORT, callback);
-
     sonicx.server.on('clientError', error => { if (error) console.warn(error); });
 }
 
@@ -191,6 +201,15 @@ Server.prototype.staticServing = function (res, baseUrl, staticPath) {
             res.writeHead(404);
             return res.end(JSON.stringify({ error: "File not found." }));
         }
+        const extName = path.extname(requestedPath);
+        const contentType = contentTypes[extName];
+
+        if(!contentType) {
+            res.writeHead(404);
+            return res.end(JSON.stringify({ error: "Route not found." }));
+        }
+
+        res.writeHead(200, { 'content-type': contentType });
         fs.createReadStream(requestedPath).pipe(res);
         // fs.readFile(requestedPath, (error, chunk) => {
         //     if (error) {
@@ -274,6 +293,7 @@ Sonicx.prototype.route = function (_path, _routes) {
 
 Sonicx.prototype.listen = function (PORT, callback) {
     new Server(this, PORT, undefined, callback);
+    return this.server;
 }
 
 Sonicx.prototype.secureListen = function (PORT, config = {}, callback) {
