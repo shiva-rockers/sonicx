@@ -47,6 +47,13 @@ sonicx.route('/', [
 sonicx.listen(4000, () => console.log("Listening on 4000"));
 ```
 
+
+## Examples
+1. [ssl configuration](https://github.com/shiva-rockers/sonicx/tree/master/examples/http_ssl)
+2. [multi file routing](https://github.com/shiva-rockers/sonicx/tree/master/examples/multi_file_routing)
+3. [serving static files](https://github.com/shiva-rockers/sonicx/tree/master/examples/serve_static_files)
+4. [simple routes](https://github.com/shiva-rockers/sonicx/tree/master/examples/simple)
+
 ## API
 Methods  | Description
 ------------- | -------------
@@ -147,10 +154,6 @@ sonicx.configuration = {
 
 res.send({ key: "It is SonicX" }, 200, { "Authorization" : "Bearer Token"});
 ```
-
-## Example
-You can find examples implemented using sonicx at [github](https://github.com/shiva-rockers/sonicx/tree/master/examples).
-
 
 License
 ----
