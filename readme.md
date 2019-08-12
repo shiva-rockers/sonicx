@@ -70,7 +70,8 @@ Eg.
 
 ```sh
 const sonicx = require('sonicx');
-var io = require('socket.io')(sonicx.server);
+const server = sonicx.listen(4000, () => console.log("Listening on 4000"));
+const io = require('socket.io')(server);
 ```
 
 

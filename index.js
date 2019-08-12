@@ -298,6 +298,7 @@ Sonicx.prototype.listen = function (PORT, callback) {
 
 Sonicx.prototype.secureListen = function (PORT, config = {}, callback) {
     new Server(this, PORT, config, callback);
+    return this.server;
 }
 
 module.exports = new Sonicx();
