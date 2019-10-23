@@ -55,6 +55,7 @@ Router.prototype.validateRoute = function (method, path) {
 
 Router.prototype.add = function (_path, _routes = [], _globalConfiguration) {
     _routes.forEach((_route) => {
+        if (typeof _route === 'function') return _route(_path);
         if (!_route.method) _route.method = 'GET';
         const method = _route.method.toUpperCase();
         const { error, errorMessage, path } = this.validateRoute(method, _path.concat(_route.path || ''));
@@ -204,7 +205,7 @@ Server.prototype.staticServing = function (res, baseUrl, staticPath) {
         const extName = path.extname(requestedPath);
         const contentType = contentTypes[extName];
 
-        if(!contentType) {
+        if (!contentType) {
             res.writeHead(404);
             return res.end(JSON.stringify({ error: "Route not found." }));
         }
@@ -278,6 +279,15 @@ Server.prototype.parseData = function (req, options, callback) {
     req.pipe(d)
 }
 
+function RouterBuilder(sonicx) {
+    this.sonicx = sonicx;
+    this.routes = [];
+}
+
+RouterBuilder.prototype.route = function (path, params) {
+    this.routes.push((secondPath) => this.sonicx.route.call(this.sonicx, secondPath + path, params));
+}
+
 function Sonicx() {
     /**
      * this.server is an instance of http.createServer(), 
@@ -288,7 +298,12 @@ function Sonicx() {
 }
 
 Sonicx.prototype.route = function (_path, _routes) {
-    router.add(_path, _routes, this.configuration);
+    const routes = _routes && _routes.routes ? _routes.routes : _routes;
+    router.add(_path, routes, this.configuration);
+}
+
+Sonicx.prototype.routeBuilder = function () {
+    return new RouterBuilder(this);
 }
 
 Sonicx.prototype.listen = function (PORT, callback) {
