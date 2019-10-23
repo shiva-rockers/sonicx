@@ -264,15 +264,19 @@ Server.prototype.parseData = function (req, options, callback) {
 
         p.on('end', () => {
             if (!file) return true;
-            filesData[key] = { filename };
+            const obj = { filename }
             if (options.memoryUpload) {
-                filesData[key]['buffer'] = Buffer.concat(file);
-                filesData[key]['length'] = filesData[key]['buffer'].length;
+                obj['buffer'] = Buffer.concat(file);
+                obj['length'] = obj['buffer'].length;
             }
             else {
-                filesData[key]['path'] = options.uploadPath + '/' + filename;
+                obj['path'] = options.uploadPath + '/' + filename;
                 file.end();
             }
+            /** Desiding weather data should be an array or object based on duplication */
+            if(filesData[key] && !Array.isArray(filesData[key])) filesData[key] = [filesData[key]];
+            if(Array.isArray(filesData[key])) filesData[key].push(obj);
+            else filesData[key] = obj;
         });
     });
     d.on('finish', () => callback({ body: objData, files: filesData }));
