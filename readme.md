@@ -120,6 +120,34 @@ sonicx.configuration = {
     ]);
    ```
 
+## Router Builder
+
+- Feature to add nested routes as parameter.
+
+    Eg.
+   ```sh
+    
+    const routeBuilder = new sonicx.routeBuilder();
+
+    routeBuilder.route('/auth', [
+        { 
+            path : '/login', 
+            method: 'post', 
+            controller: (req, res) => { res.send({ message: "controller called" } ) },
+        },
+    ]);
+    
+    routeBuilder.route('/profile', [
+        { 
+            path : '', 
+            method: 'get', 
+            controller: (req, res) => { res.send({ message: "controller called" } ) },
+        },
+    ]);
+
+    sonicx.route('/user', routeBuilder);
+   ```
+
 ## Request and Response parameter
  Request and Response parameter has all property of nodejs HTTP server handler does. [http server](https://nodejs.org/api/http.html#http_class_http_server).
  
